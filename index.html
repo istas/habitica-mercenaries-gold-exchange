@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Gift Exchange</title>
+      <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+      <script src="index.js"></script>
+  </head>
+  <body>
+    <form id="userApiDetailsForm" method="POST" action="login">
+      <fieldset>
+        <legend>
+          <span class="highlight">Enter your Habitica API credentials</span>
+          <small>
+            (from <a href="https://habitica.com/user/settings/api">User Icon &gt; Settings &gt; API</a> on the website or Settings &gt; API on the Android app or Settings &gt; Account Details on the iOS app)
+          </small>
+        </legend>
+
+        <label for="userId"><span>User ID</span>
+            <input type="text" name="userId" id="userId" autocomplete="off" value=0274708f-7994-4224-9594-2625c747e83c>
+        </label>
+
+        <label for="apiToken"><span>API Token</span>
+            <input type="password" name="apiToken" id="apiToken" value=>
+        </label>
+
+      </fieldset>
+
+      <fieldset>
+        <legend>
+          <span>Gift Details</span>
+        </legend>
+
+        <label for="recipientID"><span>Recipient User Name</span>
+            <input type="text" name="recipientID" id="recipientID" autocomplete="off" value=0274708f-7994-4224-9594-2625c747e83c>
+        </label>
+
+        <label for="gold"><span>Gold</span>
+            <input type="number" name="gold" id="gold" value=1>
+        </label>
+
+        <label for="giftMessage"><span>Gift Message</span>
+            <input type="text" name="giftMessage" id="giftMessage">
+        </label>
+
+      </fieldset>
+
+      <button id="sendGold" type="submit">Send Gold</button>
+
+    </form>
+
+  </body>
+</html>
