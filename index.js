@@ -6,7 +6,7 @@ $(document)
   .on('click', '#claimGold', claimGoldHandler);
 
 function sendGoldHandler(e) {
-  if (formIsInvalid(this)) return;
+  if (formIsInvalid(e.target)) return;
 
   e.preventDefault();
   let gifterId = $('#userID').val(),
@@ -33,7 +33,7 @@ function sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage) {
 }
 
 function claimGoldHandler(e) {
-  if (formIsInvalid(this)) return;
+  if (formIsInvalid(e.target)) return;
 
   e.preventDefault();
   let recipientID = $('#userID').val(),
@@ -113,6 +113,6 @@ function giftMessage(gifter, goldAmount, userMessage) {
   }
 }
 
-function formIsInvalid(this) {
-  $(this).closest('form')[0].checkValidity();
+function formIsInvalid(selector) {
+  return !$(selector).closest('form')[0].checkValidity();
 }
