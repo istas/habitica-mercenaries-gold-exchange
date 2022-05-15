@@ -5,19 +5,19 @@ $(document).on('click', '#sendGold', sendGoldHandler);
 
 function sendGoldHandler(e) {
   e.preventDefault();
-  sendGold();
-}
-
-async function sendGold() {
-  let gifterId = $('#userId').val(),
+  let gifterId = $('#userID').val(),
       gifterToken = $('#apiToken').val(),
       recipientID = $('#recipientID').val(),
       goldToGive = $('#gold').val(),
       userMessage = $('#giftMessage').val();
 
-  let gifter = await getUserFromId(gifterId, gifterToken);
+  sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage);
+}
 
-  let updatedGoldValue = gifter.data.stats.gp - goldToGive;
+function sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage) {
+  let gifter = getUserFromId(gifterId, gifterToken),
+      updatedGoldValue = gifter.data.stats.gp - goldToGive,
+      message = giftMessage(gifter.data.auth.local.username, goldToGive, userMessage);
 
   if (updatedGoldValue < 0) {
     console.log('not enough gold in account');
@@ -25,63 +25,67 @@ async function sendGold() {
   }
 
   updateGold(gifterId, gifterToken, updatedGoldValue);
-
-  let message = giftMessage(gifter.data.auth.local.username, goldToGive, userMessage);
   sendMessage(gifterId, gifterToken, recipientID, message);
 }
 
-async function getUserFromId(userId, token) {
-  var opts = headers(userId, token, 'GET');
-  const response = await fetch(`${URL_USER}?userFields=stats.gp`, opts);
-  return response.json();
+function getUserFromId(userID, token) {
+  return contactHabitica('GET', `${URL_USER}?userFields=stats.gp`, defaultHeaders(userID, token));
 }
 
-async function updateGold(userId, token, gold) {
-  var opts = headers(userId, token, 'PUT');
-  opts['body'] = JSON.stringify({
+function updateGold(userID, token, gold) {
+  data = JSON.stringify({
     "stats.gp": gold
   });
 
-  console.log(`setting ${userId}'s gold to ${gold}`);
-  // const response = await fetch(`${URL_USER}`, opts);
-  // return response.json();
+  console.log(`setting ${userID}'s gold to ${gold}`);
+  // contactHabitica('PUT', URL_USER, defaultHeaders(userID, token), data);
 }
 
-async function sendMessage(userId, token, to, message) {
-  var opts = headers(userId, token, 'POST');
-  opts['body'] = JSON.stringify({
+function sendMessage(userID, token, to, message) {
+  data = JSON.stringify({
     message: message,
     toUserId: to
-  })
+  });
 
-  console.log(`sending message to ${userId}: ${message}`);
-
-  // const response = await fetch(`${URL_MESSAGE}`, opts);
-  // return response.json();
+  console.log(`sending message to ${userID}: ${message}`);
+  // contactHabitica('POST', URL_MESSAGE, defaultHeaders(userID, token), data);
 }
 
-function headers(userId, token, method) {
-  return {
+function contactHabitica(method, url, headers, data) {
+  let result = null;
+  $.ajax({
+    url: url,
     method: method,
-    headers: {
-      // Do not remove x-client header.
-      // Habitica requires this to be set to the author's (or presumably the maintainer's) in case they need to
-      // contact the owner to fix an issue.
-      'x-client': '0274708f-7994-4224-9594-2625c747e83c-HabiticaGoldExchangeApp',
-      'x-api-user': userId,
-      'x-api-key': token,
-      'Content-Type': 'application/json'
+    async: false,
+    headers: headers,
+    data: data,
+    success: function (response) {
+      result = response;
     },
-    redirect: 'follow'
+    error: function (error) {
+      console.log(`Error ${error}`);
+    }
+  })
+  return result;
+}
+
+function defaultHeaders(userID, token) {
+  return {
+    // Do not remove x-client header.
+    // Habitica requires this to be set to the author's ID in case they need to contact the owner to fix an issue.
+    'x-client': '0274708f-7994-4224-9594-2625c747e83c-HabiticaGoldExchangeApp',
+    'x-api-user': userID,
+    'x-api-key': token,
+    'Content-Type': 'application/json'
   }
 }
 
 function giftMessage(gifter, goldAmount, userMessage) {
   let baseMessage = `You have been sent ${goldAmount} gold by ${gifter}`;
 
-  if (userMessage === '') {
-    return baseMessage;
-  } else {
+  if (userMessage) {
     return `${baseMessage}: ${userMessage}`
+  } else {
+    return baseMessage;
   }
 }

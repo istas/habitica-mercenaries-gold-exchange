@@ -4,7 +4,11 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Gift Exchange</title>
-      <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+      <script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous">
+      </script>
       <script src="index.js"></script>
   </head>
   <body>
@@ -17,12 +21,12 @@
           </small>
         </legend>
 
-        <label for="userId"><span>User ID</span>
-            <input type="text" name="userId" id="userId" autocomplete="off" value=0274708f-7994-4224-9594-2625c747e83c>
+        <label for="username"><span>User ID</span>
+          <input type="text" name="username" id="userID" value="0274708f-7994-4224-9594-2625c747e83c" >
         </label>
 
         <label for="apiToken"><span>API Token</span>
-            <input type="password" name="apiToken" id="apiToken" value=>
+          <input type="password" name="password" id="apiToken" value="" >
         </label>
 
       </fieldset>
@@ -33,15 +37,15 @@
         </legend>
 
         <label for="recipientID"><span>Recipient User Name</span>
-            <input type="text" name="recipientID" id="recipientID" autocomplete="off" value=0274708f-7994-4224-9594-2625c747e83c>
+          <input type="text" name="recipientID" id="recipientID" autocomplete="off" value=0274708f-7994-4224-9594-2625c747e83c>
         </label>
 
         <label for="gold"><span>Gold</span>
-            <input type="number" name="gold" id="gold" value=1>
+          <input type="number" name="gold" id="gold" value=1>
         </label>
 
         <label for="giftMessage"><span>Gift Message</span>
-            <input type="text" name="giftMessage" id="giftMessage">
+          <input type="text" name="giftMessage" id="giftMessage">
         </label>
 
       </fieldset>
