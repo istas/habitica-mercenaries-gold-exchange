@@ -70,7 +70,7 @@ function sendMessage(userID, token, to, message) {
     toUserId: to
   });
 
-  console.log(`sending message to ${userID}: ${message}`);
+  console.log(`sending message to ${userID}:\n${message}`);
   // contactHabitica('POST', URL_MESSAGE, defaultHeaders(userID, token), data);
 }
 
