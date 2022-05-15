@@ -104,15 +104,34 @@ function defaultHeaders(userID, token) {
 }
 
 function giftMessage(gifter, goldAmount, userMessage) {
-  let baseMessage = `You have been sent ${goldAmount} gold by ${gifter}`;
+  let message = `You have been sent ${goldAmount} gold by ${gifter}!\n\n`;
 
   if (userMessage) {
-    return `${baseMessage}: ${userMessage}`
-  } else {
-    return baseMessage;
+    message += `\`${userMessage}\`\n\n`
   }
+
+  message += `To claim your reward, go to ${giftLink(gifter, goldAmount, userMessage)}`
+
+  return message
 }
 
 function formIsInvalid(selector) {
   return !$(selector).closest('form')[0].checkValidity();
+}
+
+function giftLink(userName, gold, userMessage, transactionID) {
+  let queryString = new URLSearchParams({
+    from: userName,
+    gold: gold,
+    message: userMessage,
+    transactionID: transactionID
+  }).toString();
+
+  return `${baseURL()}/receive.html?${queryString}`;
+}
+
+function baseURL() {
+  let pathArr = window.location.pathname.split('/');
+  pathArr.pop()
+  return window.location.origin + pathArr.join('/');
 }
