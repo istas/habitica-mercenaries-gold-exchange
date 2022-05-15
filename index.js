@@ -1,9 +1,13 @@
 URL_USER = 'https://habitica.com/api/v3/user';
 URL_MESSAGE = 'https://habitica.com/api/v3/members/send-private-message';
 
-$(document).on('click', '#sendGold', sendGoldHandler);
+$(document)
+  .on('click', '#sendGold', sendGoldHandler)
+  .on('click', '#claimGold', claimGoldHandler);
 
 function sendGoldHandler(e) {
+  if (formIsInvalid(this)) return;
+
   e.preventDefault();
   let gifterId = $('#userID').val(),
       gifterToken = $('#apiToken').val(),
@@ -16,7 +20,7 @@ function sendGoldHandler(e) {
 
 function sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage) {
   let gifter = getUserFromId(gifterId, gifterToken),
-      updatedGoldValue = gifter.data.stats.gp - goldToGive,
+      updatedGoldValue = gifter.data.stats.gp - parseInt(goldToGive),
       message = giftMessage(gifter.data.auth.local.username, goldToGive, userMessage);
 
   if (updatedGoldValue < 0) {
@@ -26,6 +30,25 @@ function sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage) {
 
   updateGold(gifterId, gifterToken, updatedGoldValue);
   sendMessage(gifterId, gifterToken, recipientID, message);
+}
+
+function claimGoldHandler(e) {
+  if (formIsInvalid(this)) return;
+
+  e.preventDefault();
+  let recipientID = $('#userID').val(),
+      recipientToken = $('#apiToken').val(),
+      gold = $('#gold').val();
+
+  claimGold(recipientID, recipientToken, gold);
+}
+
+function claimGold(recipientID, recipientToken, gold) {
+  let user = getUserFromId(recipientID, recipientToken),
+      updatedGoldValue = user.data.stats.gp + parseInt(gold);
+
+  console.log(user.data.stats.gp);
+  updateGold(recipientID, recipientToken, updatedGoldValue);
 }
 
 function getUserFromId(userID, token) {
@@ -88,4 +111,8 @@ function giftMessage(gifter, goldAmount, userMessage) {
   } else {
     return baseMessage;
   }
+}
+
+function formIsInvalid(this) {
+  $(this).closest('form')[0].checkValidity();
 }

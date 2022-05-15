@@ -10,9 +10,31 @@
         crossorigin="anonymous">
       </script>
       <script src="index.js"></script>
+      <script src="receive.js"></script>
   </head>
   <body>
-    <form id="userApiDetailsForm" method="POST" action="login">
+
+    <fieldset>
+      <legend>
+        <span>You've been sent some gold!</span>
+      </legend>
+
+      <label for="gifterUserName"><span>From</span>
+        <input type="text" name="gifterUserName" id="gifterUserName" autocomplete="off" disabled=disabled>
+      </label>
+
+      <label for="gold"><span>Gold</span>
+        <input type="number" name="gold" id="gold" disabled=disabled required >
+      </label>
+
+      <label for="giftMessage"><span>Gift Message</span>
+        <input type="text" name="giftMessage" id="giftMessage" disabled=disabled>
+      </label>
+
+    </fieldset>
+
+    <form id="recieveGoldForm" method="POST" action="login">
+
       <fieldset>
         <legend>
           <span class="highlight">Enter your Habitica API credentials</span>
@@ -31,26 +53,7 @@
 
       </fieldset>
 
-      <fieldset>
-        <legend>
-          <span>Gift Details</span>
-        </legend>
-
-        <label for="recipientID"><span>Recipient ID</span>
-          <input type="text" name="recipientID" id="recipientID" autocomplete="off" required value=0274708f-7994-4224-9594-2625c747e83c>
-        </label>
-
-        <label for="gold"><span>Gold</span>
-          <input type="number" name="gold" id="gold" required value=1>
-        </label>
-
-        <label for="giftMessage"><span>Gift Message</span>
-          <input type="text" name="giftMessage" id="giftMessage">
-        </label>
-
-      </fieldset>
-
-      <button id="sendGold" type="submit">Send Gold</button>
+      <button id="claimGold" type="submit" disabled=disabled>Claim Gold</button>
 
     </form>
 
