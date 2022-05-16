@@ -1,26 +1,73 @@
 URL_USER = 'https://habitica.com/api/v3/user';
 URL_MESSAGE = 'https://habitica.com/api/v3/members/send-private-message';
+URL_MEMBER = 'https://habitica.com/api/v3/members'
 
 $(document)
+  .on('click', '#confirmSendGold', confirmSendGoldHandler)
   .on('click', '#sendGold', sendGoldHandler)
   .on('click', '#claimGold', claimGoldHandler);
 
-function sendGoldHandler(e) {
-  if (formIsInvalid(e.target)) return;
+function confirmSendGoldHandler(e) {
+  if (validateForm(e) === false) return;
 
-  e.preventDefault();
   let gifterId = $('#userID').val(),
       gifterToken = $('#apiToken').val(),
       recipientID = $('#recipientID').val(),
-      goldToGive = $('#gold').val(),
+      goldToGive = parseInt($('#gold').val());
+
+  let gifter = getUserFromId(gifterId, gifterToken),
+      recipient = getMemberProfile(gifterId, gifterToken, recipientID),
+      errors = validateCanSendGold(gifter, recipient, goldToGive);
+
+  if (errors.length !== 0) {
+    return showErrorModal(errors);
+  }
+
+  sendGoldConfirmationModal(recipient, goldToGive);
+}
+
+function sendGoldHandler(e) {
+  if (validateForm(e) === false) return;
+
+  let gifterId = $('#userID').val(),
+      gifterToken = $('#apiToken').val(),
+      recipientID = $('#recipientID').val(),
+      goldToGive = parseInt($('#gold').val()),
       userMessage = $('#giftMessage').val();
 
   sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage);
 }
 
+function sendGoldConfirmationModal(recipient, gold) {
+  let body = $('#confirmModal .modal-body'),
+      p = document.createElement('p');
+
+  body.empty();
+  p.innerHTML = `Send ${gold} gold to ${recipient.data.auth.local.username}?`;
+  body.append(p);
+
+  (new bootstrap.Modal('#confirmModal')).show();
+}
+
+function validateCanSendGold(gifter, recipient, goldToGive) {
+  let errors = [];
+
+  if (gifter == null) {
+    errors.push('Something has gone wrong. Please verify your User ID and API Token are correct and try again.');
+  } else if ((gifter.data.stats.gp - goldToGive) < 0) {
+    errors.push(`Not enough gold in your account. You have ${gifter.data.stats.gp} gold.`);
+  }
+
+  if (recipient == null) {
+    errors.push('Unable to find the user you are trying to send gold to. Please verify their User ID is correct and try again.');
+  }
+
+  return errors;
+}
+
 function sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage) {
   let gifter = getUserFromId(gifterId, gifterToken),
-      updatedGoldValue = gifter.data.stats.gp - parseInt(goldToGive),
+      updatedGoldValue = gifter.data.stats.gp - goldToGive,
       message = giftMessage(gifter.data.auth.local.username, goldToGive, userMessage);
 
   if (updatedGoldValue < 0) {
@@ -33,12 +80,19 @@ function sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage) {
 }
 
 function claimGoldHandler(e) {
-  if (formIsInvalid(e.target)) return;
+  if (validateForm(e) === false) return;
 
   e.preventDefault();
   let recipientID = $('#userID').val(),
       recipientToken = $('#apiToken').val(),
       gold = $('#gold').val();
+
+
+  let recipient = getUserFromId(recipientID, recipientToken);
+
+  if (recipient === null) {
+    return showErrorModal(['Something has gone wrong. Please verify your User ID and API Token are correct and try again.']);
+  }
 
   claimGold(recipientID, recipientToken, gold);
 }
@@ -72,6 +126,10 @@ function sendMessage(userID, token, to, message) {
 
   console.log(`sending message to ${userID}:\n${message}`);
   // contactHabitica('POST', URL_MESSAGE, defaultHeaders(userID, token), data);
+}
+
+function getMemberProfile(userID, token, memberID) {
+  return contactHabitica('GET', `${URL_MEMBER}/${memberID}`, defaultHeaders(userID, token));
 }
 
 function contactHabitica(method, url, headers, data) {
@@ -115,10 +173,6 @@ function giftMessage(gifter, goldAmount, userMessage) {
   return message
 }
 
-function formIsInvalid(selector) {
-  return !$(selector).closest('form')[0].checkValidity();
-}
-
 function giftLink(userName, gold, userMessage, transactionID) {
   let queryString = new URLSearchParams({
     from: userName,
@@ -134,4 +188,25 @@ function baseURL() {
   let pathArr = window.location.pathname.split('/');
   pathArr.pop()
   return window.location.origin + pathArr.join('/');
+}
+
+function validateForm(e) {
+  let form = $(e.target).closest('form')[0];
+  e.preventDefault();
+  form.classList.add('was-validated');
+  return form.checkValidity();
+}
+
+function showErrorModal(errors) {
+  let body = $('#errorModal .modal-body');
+  body.empty();
+
+  errors.forEach((error, i) => {
+    var p = document.createElement('p');
+    p.innerHTML = error;
+
+    body.append(p);
+  });
+
+  (new bootstrap.Modal('#errorModal')).show();
 }

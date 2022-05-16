@@ -9,50 +9,96 @@
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
         crossorigin="anonymous">
       </script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous">
+      </script>
       <script src="index.js"></script>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+        crossorigin="anonymous">
   </head>
-  <body>
-    <form id="userApiDetailsForm" method="POST" action="login">
+  <body class="container">
+    <h1>Send some gold</h1>
+
+    <form id="userApiDetailsForm" method="POST" action="login" class="needs-validation">
       <fieldset>
         <legend>
-          <span class="highlight">Enter your Habitica API credentials</span>
-          <small>
-            (from <a href="https://habitica.com/user/settings/api" target=_blank>User Icon &gt; Settings &gt; API</a> on the website or Settings &gt; API on the Android app or Settings &gt; Account Details on the iOS app)
+          <h3>Enter your Habitica API credentials
+            <small class="fs-6" data-bs-toggle="collapse" data-bs-target="#dudeWheresMyCredentials" aria-expanded="false" aria-controls="dudeWheresMyCredentials">
+              (my wut
+              <icon>
+                &#10067;
+              </icon>
+              )
+            </small>
+          </h3>
+          <small id="dudeWheresMyCredentials" class="fs-6 collapse">
+            <hr>
+            You can get your Habitica API credentials from <a href="https://habitica.com/user/settings/api" target=_blank>User Icon &gt; Settings &gt; API</a> on the website or Settings &gt; API on the Android app or Settings &gt; Account Details on the iOS app
+            <hr>
           </small>
         </legend>
 
-        <label for="username"><span>User ID</span>
-          <input type="text" name="username" id="userID" required value="0274708f-7994-4224-9594-2625c747e83c" >
-        </label>
+        <label class="form-label" for="username">User ID</label>
+        <input class="form-control" type="text" name="username" id="userID" required value="0274708f-7994-4224-9594-2625c747e83c" >
 
-        <label for="apiToken"><span>API Token</span>
-          <input type="password" name="password" id="apiToken" required value="" >
-        </label>
+        <label class="form-label" for="apiToken">API Token</label>
+        <input class="form-control" type="password" name="password" id="apiToken" required value="" >
 
       </fieldset>
 
-      <fieldset>
-        <legend>
-          <span>Gift Details</span>
-        </legend>
+      <fieldset class="mb-3">
+        <legend>Gift Details</legend>
 
-        <label for="recipientID"><span>Recipient ID</span>
-          <input type="text" name="recipientID" id="recipientID" autocomplete="off" required value=0274708f-7994-4224-9594-2625c747e83c>
-        </label>
+        <label class="form-label" for="recipientID">Recipient ID</label>
+        <input class="form-control" type="text" name="recipientID" id="recipientID" autocomplete="off" required value=0274708f-7994-4224-9594-2625c747e83c>
 
-        <label for="gold"><span>Gold</span>
-          <input type="number" name="gold" id="gold" required min=1 value=1>
-        </label>
+        <label class="form-label" for="gold">Gold</label>
+        <input class="form-control" type="number" name="gold" id="gold" required min=1 value=1>
 
-        <label for="giftMessage"><span>Gift Message</span>
-          <input type="text" name="giftMessage" id="giftMessage">
-        </label>
+        <label class="form-label" for="giftMessage">Gift Message</label>
+        <textarea class="form-control" name="giftMessage" id="giftMessage"></textarea>
 
       </fieldset>
 
-      <button id="sendGold" type="submit">Send Gold</button>
+      <button id="confirmSendGold" type="submit" class="btn btn-primary">Send Gold</button>
+
+      <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="confirmModalLabel">Confirm Gift</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button id="sendGold" type="button" class="btn btn-primary" data-bs-dismiss="modal">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </form>
 
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="errorModalLabel">Something Went Wrong</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
