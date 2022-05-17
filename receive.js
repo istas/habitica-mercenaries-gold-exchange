@@ -3,9 +3,16 @@ const urlParams = new URLSearchParams(window.location.search);
 $(document).ready(initializeForm)
 
 function initializeForm() {
-  $('#gifterUserName').val(urlParams.get('from'));
-  $('#giftMessage').val(urlParams.get('message'));
-  $('#gold').val(urlParams.get('gold'));
+  let gold = parseFloat(urlParams.get('gold'));
 
-  $('#claimGold').removeAttr("disabled");
+  if (gold > 0) {
+    $('#gifterUserName').text(urlParams.get('from'));
+    $('#giftMessage').text(urlParams.get('message'));
+    $('#gold').text(urlParams.get('gold'));
+
+    $('#goodToGoAlert').show();
+    $('#claimGold').removeAttr("disabled");
+  } else {
+    $('#badUrlAlert').show();
+  }
 }

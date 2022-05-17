@@ -13,7 +13,7 @@ function confirmSendGoldHandler(e) {
   let gifterId = $('#userID').val(),
       gifterToken = $('#apiToken').val(),
       recipientID = $('#recipientID').val(),
-      goldToGive = parseInt($('#gold').val());
+      goldToGive = parseFloat($('#gold').val());
 
   let gifter = getUserFromId(gifterId, gifterToken),
       recipient = getMemberProfile(gifterId, gifterToken, recipientID),
@@ -32,7 +32,7 @@ function sendGoldHandler(e) {
   let gifterId = $('#userID').val(),
       gifterToken = $('#apiToken').val(),
       recipientID = $('#recipientID').val(),
-      goldToGive = parseInt($('#gold').val()),
+      goldToGive = parseFloat($('#gold').val()),
       userMessage = $('#giftMessage').val();
 
   sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage);
@@ -65,6 +65,16 @@ function validateCanSendGold(gifter, recipient, goldToGive) {
   return errors;
 }
 
+function validateCanClaimGold(user, gold) {
+  let errors = [];
+
+  if (user == null) {
+    errors.push('Something has gone wrong. Please verify your User ID and API Token are correct and try again.');
+  }
+
+  return errors;
+}
+
 function sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage) {
   let gifter = getUserFromId(gifterId, gifterToken),
       updatedGoldValue = gifter.data.stats.gp - goldToGive,
@@ -85,13 +95,12 @@ function claimGoldHandler(e) {
   e.preventDefault();
   let recipientID = $('#userID').val(),
       recipientToken = $('#apiToken').val(),
-      gold = $('#gold').val();
+      gold = parseFloat($('#gold').text()),
+      recipient = getUserFromId(recipientID, recipientToken);
+      errors = validateCanClaimGold(recipient, gold);
 
-
-  let recipient = getUserFromId(recipientID, recipientToken);
-
-  if (recipient === null) {
-    return showErrorModal(['Something has gone wrong. Please verify your User ID and API Token are correct and try again.']);
+  if (errors.length !== 0) {
+    return showErrorModal(errors);
   }
 
   claimGold(recipientID, recipientToken, gold);
@@ -99,7 +108,7 @@ function claimGoldHandler(e) {
 
 function claimGold(recipientID, recipientToken, gold) {
   let user = getUserFromId(recipientID, recipientToken),
-      updatedGoldValue = user.data.stats.gp + parseInt(gold);
+      updatedGoldValue = parseFloat(user.data.stats.gp) + gold;
 
   console.log(user.data.stats.gp);
   updateGold(recipientID, recipientToken, updatedGoldValue);

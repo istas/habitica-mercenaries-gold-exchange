@@ -23,16 +23,23 @@
   <body class="container">
     <h1>You've been sent some gold!</h1>
 
-    <fieldset class="mb-3">
-      <label for="gifterUserName">From</label>
-      <input type="text" name="gifterUserName" id="gifterUserName" autocomplete="off" disabled=disabled>
+    <div id="goodToGoAlert" class="alert alert-primary collapse">
+      <p class="fs-5">
+        <span id="gifterUserName" class="font-monospace"></span> has sent you <span id="gold" class="font-monospace"></span> gold!
+      </p>
+      <p class="fs-5">
+        <span id="giftMessage" class="font-monospace"></span>
+      </p>
+    </div>
 
-      <label for="gold">Gold</label>
-      <input type="number" name="gold" id="gold" disabled=disabled min=1 required >
-
-      <label for="giftMessage">Gift Message</label>
-      <input type="text" name="giftMessage" id="giftMessage" disabled=disabled>
-    </fieldset>
+    <div id="badUrlAlert" class="alert alert-danger collapse">
+      <p class="fs-5">
+        Oh no. It looks like there is an issue with the link you've followed.
+      </p>
+      <p class="fs-5">
+        For help you can contact <span class="font-monospace">@istas</span> (<span class="font-monospace">0274708f-7994-4224-9594-2625c747e83c</span>) on Habitica
+      </p>
+    </div>
 
     <form id="recieveGoldForm" method="POST" action="login">
 
@@ -55,10 +62,10 @@
         </legend>
 
         <label class="form-label" for="username">User ID</label>
-        <input class="form-control" type="text" name="username" id="userID" required value="0274708f-7994-4224-9594-2625c747e83c" >
+        <input class="form-control" type="text" name="username" id="userID" required >
 
         <label class="form-label" for="apiToken">API Token</label>
-        <input class="form-control" type="password" name="password" id="apiToken" required value="" >
+        <input class="form-control" type="password" name="password" id="apiToken" required >
       </fieldset>
 
       <button id="claimGold" type="submit" class="btn btn-primary" disabled=disabled>Claim Gold</button>
