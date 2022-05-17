@@ -13,10 +13,11 @@ function confirmSendGoldHandler(e) {
   let gifterId = $('#userID').val(),
       gifterToken = $('#apiToken').val(),
       recipientID = $('#recipientID').val(),
-      goldToGive = parseFloat($('#gold').val());
+      goldToGive = parseFloat($('#gold').val()),
+      headers = defaultHeaders(gifterId, gifterToken);
 
-  let gifter = getUserFromId(gifterId, gifterToken),
-      recipient = getMemberProfile(gifterId, gifterToken, recipientID),
+  let gifter = getUserFromId(gifterId, headers),
+      recipient = getMemberProfile(recipientID, headers),
       errors = validateCanSendGold(gifter, recipient, goldToGive);
 
   if (errors.length !== 0) {
@@ -33,9 +34,13 @@ function sendGoldHandler(e) {
       gifterToken = $('#apiToken').val(),
       recipientID = $('#recipientID').val(),
       goldToGive = parseFloat($('#gold').val()),
-      userMessage = $('#giftMessage').val();
+      userMessage = $('#giftMessage').val(),
+      headers = defaultHeaders(gifterId, gifterToken);
 
-  sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage);
+  let gifter = getUserFromId(gifterId, headers),
+      recipient = getMemberProfile(recipientID, headers);
+
+  sendGold(gifterId, recipientID, goldToGive, userMessage, headers);
 }
 
 function sendGoldConfirmationModal(recipient, gold) {
@@ -75,9 +80,9 @@ function validateCanClaimGold(user, gold) {
   return errors;
 }
 
-function sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage) {
-  let gifter = getUserFromId(gifterId, gifterToken),
-      updatedGoldValue = gifter.data.stats.gp - goldToGive,
+function sendGold(gifterId, recipientID, goldToGive, userMessage, headers) {
+  let gifter = getUserFromId(gifterId, headers),
+      updatedGoldValue = parseFloat(gifter.data.stats.gp) - goldToGive,
       message = giftMessage(gifter.data.auth.local.username, goldToGive, userMessage);
 
   if (updatedGoldValue < 0) {
@@ -85,8 +90,8 @@ function sendGold(gifterId, gifterToken, recipientID, goldToGive, userMessage) {
     return;
   }
 
-  updateGold(gifterId, gifterToken, updatedGoldValue);
-  sendMessage(gifterId, gifterToken, recipientID, message);
+  updateGold(gifterId, updatedGoldValue, headers);
+  sendMessage(recipientID, message, headers);
 }
 
 function claimGoldHandler(e) {
@@ -96,49 +101,49 @@ function claimGoldHandler(e) {
   let recipientID = $('#userID').val(),
       recipientToken = $('#apiToken').val(),
       gold = parseFloat($('#gold').text()),
-      recipient = getUserFromId(recipientID, recipientToken);
+      headers = defaultHeaders(recipientID, recipientToken),
+      recipient = getUserFromId(recipientID, headers);
       errors = validateCanClaimGold(recipient, gold);
 
   if (errors.length !== 0) {
     return showErrorModal(errors);
   }
 
-  claimGold(recipientID, recipientToken, gold);
+  claimGold(recipientID, gold, headers);
 }
 
-function claimGold(recipientID, recipientToken, gold) {
-  let user = getUserFromId(recipientID, recipientToken),
+function claimGold(recipientID, gold, headers) {
+  let user = getUserFromId(recipientID, headers),
       updatedGoldValue = parseFloat(user.data.stats.gp) + gold;
 
-  console.log(user.data.stats.gp);
-  updateGold(recipientID, recipientToken, updatedGoldValue);
+  updateGold(recipientID, updatedGoldValue, headers);
 }
 
-function getUserFromId(userID, token) {
-  return contactHabitica('GET', `${URL_USER}?userFields=stats.gp`, defaultHeaders(userID, token));
+function getUserFromId(userID, headers) {
+  return contactHabitica('GET', `${URL_USER}?userFields=stats.gp`, headers);
 }
 
-function updateGold(userID, token, gold) {
+function updateGold(userID, gold, headers) {
   data = JSON.stringify({
     "stats.gp": gold
   });
 
   console.log(`setting ${userID}'s gold to ${gold}`);
-  // contactHabitica('PUT', URL_USER, defaultHeaders(userID, token), data);
+  return contactHabitica('PUT', URL_USER, headers, data);
 }
 
-function sendMessage(userID, token, to, message) {
+function sendMessage(to, message, headers) {
   data = JSON.stringify({
     message: message,
     toUserId: to
   });
 
-  console.log(`sending message to ${userID}:\n${message}`);
-  // contactHabitica('POST', URL_MESSAGE, defaultHeaders(userID, token), data);
+  console.log(`sending message to ${to}:\n${message}`);
+  return contactHabitica('POST', URL_MESSAGE, headers, data);
 }
 
-function getMemberProfile(userID, token, memberID) {
-  return contactHabitica('GET', `${URL_MEMBER}/${memberID}`, defaultHeaders(userID, token));
+function getMemberProfile(memberID, headers) {
+  return contactHabitica('GET', `${URL_MEMBER}/${memberID}`, headers);
 }
 
 function contactHabitica(method, url, headers, data) {
@@ -153,7 +158,8 @@ function contactHabitica(method, url, headers, data) {
       result = response;
     },
     error: function (error) {
-      console.log(`Error ${error}`);
+      result = error;
+      console.log(error);
     }
   })
   return result;
